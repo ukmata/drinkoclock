@@ -161,8 +161,10 @@ function getTimeInZone(tz) {
   };
 }
  
+// Hour (0–23) when drink'o'clock starts. Set to 19 for a later start.
+const DRINK_START_HOUR = 18;
+ 
 function vibeFor(hour) {
-  if (hour >= 16 && hour < 18) return "Sundowner hour — the day is softening into evening.";
   if (hour >= 18 && hour < 20) return "Prime aperitivo time. Pull up a stool.";
   if (hour >= 20 && hour < 22) return "Dinner is in full swing. Grab a glass.";
   if (hour >= 22 && hour < 24) return "The bars are loud. The night is young.";
@@ -171,7 +173,7 @@ function vibeFor(hour) {
 }
  
 function isDrinkingHour(hour) {
-  return (hour >= 16 && hour <= 23) || (hour >= 0 && hour < 3);
+  return hour >= DRINK_START_HOUR || hour < 3;
 }
  
 function localSubtitleFor(hour) {
@@ -196,14 +198,14 @@ function localSubtitleFor(hour) {
       tone: "borderline"
     };
   }
-  // Afternoon before 4pm: not quite, but defensible
-  if (hour >= 12 && hour < 16) {
+  // Afternoon before drink'o'clock: not quite, but defensible
+  if (hour >= 12 && hour < DRINK_START_HOUR) {
     return {
       text: "It's past noon — and somewhere in the world, the night is just getting going.",
       tone: "borderline"
     };
   }
-  // 4pm onwards: green light
+  // DRINK_START_HOUR onwards: green light
   return {
     text: "It's always drink'o'clock somewhere. Let's find out where.",
     tone: "ok"
