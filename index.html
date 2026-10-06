@@ -242,10 +242,9 @@ function localSubtitleFor(hour) {
 }
  
 function showMyTime() {
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const now = new Date();
   const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  document.getElementById('myTime').textContent = `It's ${time} where you are (${tz})`;
+  document.getElementById('myTime').textContent = `It's ${time} where you are`;
  
   const sub = localSubtitleFor(now.getHours());
   const subEl = document.getElementById('subtitle');
