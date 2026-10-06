@@ -260,9 +260,9 @@ let lastShareText = '';
 const GYG_PARTNER_ID = '';
  
 // tourQuery overrides the GetYourGuide search for cities where
-// "<name> bar tour" finds nothing or the wrong place.
+// the default pub crawl search finds nothing or the wrong place.
 function tourUrlFor(city) {
-  const params = new URLSearchParams({ q: city.tourQuery || `${city.name} bar tour` });
+  const params = new URLSearchParams({ q: city.tourQuery || `Pub crawls & bar tours, ${city.name}` });
   if (GYG_PARTNER_ID) params.set('partner_id', GYG_PARTNER_ID);
   return `https://www.getyourguide.com/s/?${params}`;
 }
@@ -311,7 +311,7 @@ function findDrink() {
   tour.href = tourUrlFor(pick);
   tour.textContent = pick.tourQuery
     ? `Tours & experiences in ${pick.name} →`
-    : `Bar tours & tastings in ${pick.name} →`;
+    : `Pub crawls & bar tours in ${pick.name} →`;
  
   const result = document.getElementById('result');
   result.classList.remove('show');
