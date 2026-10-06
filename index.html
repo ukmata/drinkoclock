@@ -276,16 +276,19 @@ function tourUrlFor(city) {
 async function shareDrink() {
   const url = 'https://drinkoclock.app/';
   const btn = document.getElementById('shareBtn');
+  const message = `${lastShareText} ${url}`;
   if (navigator.share) {
     try {
-      await navigator.share({ title: "drink'o'clock", text: lastShareText, url });
+      // Link goes inside the text rather than as a separate `url`: some
+      // Android share targets (WhatsApp, Oppo/ColorOS) drop the text otherwise.
+      await navigator.share({ title: "drink'o'clock", text: message });
       return;
     } catch (e) {
       if (e.name === 'AbortError') return;
     }
   }
   try {
-    await navigator.clipboard.writeText(`${lastShareText} ${url}`);
+    await navigator.clipboard.writeText(message);
     btn.textContent = 'Copied to clipboard!';
   } catch (e) {
     btn.textContent = "Couldn't copy, sorry";
