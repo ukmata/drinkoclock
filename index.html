@@ -173,7 +173,7 @@ const cities = [
   { name: 'Cairo', country: 'Egypt', tz: 'Africa/Cairo', drink: "A Stella beer by the Nile" },
   { name: 'Marrakech', country: 'Morocco', tz: 'Africa/Casablanca', drink: "A glass of Moroccan red in the medina" },
   { name: 'Nairobi', country: 'Kenya', tz: 'Africa/Nairobi', drink: "A cold Tusker at sundown" },
-  { name: 'Prishtinë', country: 'Kosovo', tz: 'Europe/Amsterdam', drink: "Raki with mezze, slowly" },
+  { name: 'Prishtinë', country: 'Kosovo', tz: 'Europe/Amsterdam', drink: "Raki with mezze, slowly", tourQuery: 'Pristina' },
 ];
  
 function getTimeInZone(tz) {
@@ -259,8 +259,10 @@ let lastShareText = '';
 // the links still work, they just don't earn commission.
 const GYG_PARTNER_ID = '';
  
+// tourQuery overrides the GetYourGuide search for cities where
+// "<name> bar tour" finds nothing or the wrong place.
 function tourUrlFor(city) {
-  const params = new URLSearchParams({ q: `${city.name} bar tour` });
+  const params = new URLSearchParams({ q: city.tourQuery || `${city.name} bar tour` });
   if (GYG_PARTNER_ID) params.set('partner_id', GYG_PARTNER_ID);
   return `https://www.getyourguide.com/s/?${params}`;
 }
@@ -307,7 +309,9 @@ function findDrink() {
   lastShareText = `It's ${time.display} in ${pick.name} 🍸 House pour: ${pick.drink}.`;
   const tour = document.getElementById('tourLink');
   tour.href = tourUrlFor(pick);
-  tour.textContent = `Bar tours & tastings in ${pick.name} →`;
+  tour.textContent = pick.tourQuery
+    ? `Tours & experiences in ${pick.name} →`
+    : `Bar tours & tastings in ${pick.name} →`;
  
   const result = document.getElementById('result');
   result.classList.remove('show');
