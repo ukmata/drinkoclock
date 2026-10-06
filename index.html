@@ -164,7 +164,7 @@ const cities = [
   { name: 'Los Angeles', country: 'USA', tz: 'America/Los_Angeles', drink: "A skinny margarita on a patio" },
   { name: 'San Francisco', country: 'USA', tz: 'America/Los_Angeles', drink: "A Negroni with a view of the bay" },
   { name: 'Mexico City', country: 'Mexico', tz: 'America/Mexico_City', drink: "Mezcal, neat, with orange and sal de gusano" },
-  { name: 'Havana', country: 'Cuba', tz: 'America/Havana', drink: "A Mojito on a rooftop" },
+  { name: 'Havana', country: 'Cuba', tz: 'America/Havana', drink: "A Mojito on a rooftop", tourQuery: false },
   { name: 'Honolulu', country: 'USA', tz: 'Pacific/Honolulu', drink: "A Mai Tai by the sea" },
   { name: 'Sydney', country: 'Australia', tz: 'Australia/Sydney', drink: "A Hunter Valley shiraz at the harbour" },
   { name: 'Melbourne', country: 'Australia', tz: 'Australia/Melbourne', drink: "An Espresso Martini in a laneway bar" },
@@ -261,6 +261,7 @@ const GYG_PARTNER_ID = '';
  
 // tourQuery overrides the GetYourGuide search for cities where
 // the default pub crawl search finds nothing or the wrong place.
+// Set it to false to hide the link where GetYourGuide has no listings.
 function tourUrlFor(city) {
   const params = new URLSearchParams({ q: city.tourQuery || `Pub crawls & bar tours, ${city.name}` });
   if (GYG_PARTNER_ID) params.set('partner_id', GYG_PARTNER_ID);
@@ -308,6 +309,7 @@ function findDrink() {
  
   lastShareText = `It's ${time.display} in ${pick.name} 🍸 House pour: ${pick.drink}.`;
   const tour = document.getElementById('tourLink');
+  tour.hidden = pick.tourQuery === false;
   tour.href = tourUrlFor(pick);
   tour.textContent = pick.tourQuery
     ? `Tours & experiences in ${pick.name} →`
