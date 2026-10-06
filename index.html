@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>drink'o'clock</title>
+<meta name="description" content="It's always drink'o'clock somewhere. One tap finds a city where it's happy hour right now, and what to order there.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://drinkoclock.app/">
+<meta property="og:title" content="drink'o'clock">
+<meta property="og:description" content="It's always drink'o'clock somewhere. Find out where.">
+<meta property="og:image" content="https://drinkoclock.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="drink'o'clock: It's always drink'o'clock somewhere.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="drink'o'clock">
+<meta name="twitter:description" content="It's always drink'o'clock somewhere. Find out where.">
+<meta name="twitter:image" content="https://drinkoclock.app/og-image.png">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -77,6 +90,18 @@
     margin-bottom: 0.4rem;
   }
   #drink { font-size: 1.05rem; }
+  .actions { margin-top: 1.4rem; display: flex; flex-direction: column; align-items: center; gap: 0.9rem; }
+  button.share-btn {
+    background: transparent;
+    border: 1px solid rgba(245, 215, 110, 0.5);
+    color: #f5d76e;
+    padding: 0.7rem 1.6rem;
+    font-size: 0.95rem;
+    box-shadow: none;
+  }
+  button.share-btn:hover { background: rgba(245, 215, 110, 0.1); box-shadow: none; }
+  .tour-link { color: #fff; opacity: 0.75; font-size: 0.9rem; text-decoration: underline; text-underline-offset: 3px; }
+  .tour-link:hover { opacity: 1; }
   .footer { margin-top: 2rem; font-size: 0.8rem; opacity: 0.4; }
 </style>
 </head>
@@ -94,6 +119,10 @@
     <div class="drink">
       <span class="drink-label">House Pour</span>
       <span id="drink"></span>
+    </div>
+    <div class="actions">
+      <button class="share-btn" id="shareBtn" onclick="shareDrink()">Share this round</button>
+      <a class="tour-link" id="tourLink" target="_blank" rel="noopener sponsored"></a>
     </div>
   </div>
   <p class="footer">Please drink responsibly.</p>
@@ -225,6 +254,37 @@ function showMyTime() {
 }
  
 let lastPickName = null;
+let lastShareText = '';
+ 
+// GetYourGuide affiliate partner ID. Leave empty until you have one;
+// the links still work, they just don't earn commission.
+const GYG_PARTNER_ID = '';
+ 
+function tourUrlFor(city) {
+  const params = new URLSearchParams({ q: `${city.name} bar tour` });
+  if (GYG_PARTNER_ID) params.set('partner_id', GYG_PARTNER_ID);
+  return `https://www.getyourguide.com/s/?${params}`;
+}
+ 
+async function shareDrink() {
+  const url = 'https://drinkoclock.app/';
+  const btn = document.getElementById('shareBtn');
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: "drink'o'clock", text: lastShareText, url });
+      return;
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(`${lastShareText} ${url}`);
+    btn.textContent = 'Copied to clipboard!';
+  } catch (e) {
+    btn.textContent = "Couldn't copy, sorry";
+  }
+  setTimeout(() => { btn.textContent = 'Share this round'; }, 2000);
+}
  
 function findDrink() {
   const candidates = cities.filter(c => isDrinkingHour(getTimeInZone(c.tz).hour));
@@ -244,6 +304,11 @@ function findDrink() {
   document.getElementById('localTime').textContent = `Local time: ${time.display}`;
   document.getElementById('vibe').textContent = vibeFor(time.hour);
   document.getElementById('drink').textContent = pick.drink;
+ 
+  lastShareText = `It's ${time.display} in ${pick.name} 🍸 House pour: ${pick.drink}.`;
+  const tour = document.getElementById('tourLink');
+  tour.href = tourUrlFor(pick);
+  tour.textContent = `Bar tours & tastings in ${pick.name} →`;
  
   const result = document.getElementById('result');
   result.classList.remove('show');
